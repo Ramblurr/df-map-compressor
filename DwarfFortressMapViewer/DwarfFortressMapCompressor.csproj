@@ -1,0 +1,213 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2D467694-6C19-4DAA-A26D-ADF56AF9AB4D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DwarfFortressMapCompressor</RootNamespace>
+    <AssemblyName>DwarfFortressMapCompressor</AssemblyName>
+    <ManifestCertificateThumbprint>80FF030D468E1DC0F103F7AA58086200F3BC947E</ManifestCertificateThumbprint>
+    <ManifestKeyFile>DwarfFortressMapViewer_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationIcon>dfmvicon.ico</ApplicationIcon>
+    <TargetZone>Custom</TargetZone>
+    <PublishUrl>C:\Documents and Settings\Owner\My Documents\Visual Studio 2005\Projects\DwarfFortressMapViewer\DwarfFortressMapViewer\publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.1.271, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BitmapPartBytes.cs" />
+    <Compile Include="Common\CRC.cs" />
+    <Compile Include="DFColor.cs" />
+    <Compile Include="DomainUpDownIgnoringMousewheel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MapBitmapData.cs" />
+    <Compile Include="MapViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MapViewer.Designer.cs">
+      <DependentUpon>MapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PartialBitmapLoader.cs" />
+    <Compile Include="Sanity.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SimpleMainMenuForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SimpleMainMenuForm.Designer.cs">
+      <DependentUpon>SimpleMainMenuForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TileSizeChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TileSizeChooser.Designer.cs">
+      <DependentUpon>TileSizeChooser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WindowBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FastMapViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FastMapViewer.Designer.cs">
+      <DependentUpon>FastMapViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ICoder.cs" />
+    <Compile Include="LZMAStream.cs" />
+    <Compile Include="LZMA\LzmaBase.cs" />
+    <Compile Include="LZMA\LzmaDecoder.cs" />
+    <Compile Include="LZMA\LzmaEncoder.cs" />
+    <Compile Include="LZW.cs" />
+    <Compile Include="LZ\IMatchFinder.cs" />
+    <Compile Include="LZ\LzBinTree.cs" />
+    <Compile Include="LZ\LzInWindow.cs" />
+    <Compile Include="LZ\LzOutWindow.cs" />
+    <Compile Include="ProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProgressForm.Designer.cs">
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RangeCoder\RangeCoder.cs" />
+    <Compile Include="RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="TiffWriter.cs" />
+    <Compile Include="TiledBitmapWrapper.cs" />
+    <Compile Include="MainMenuForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMenuForm.Designer.cs">
+      <DependentUpon>MainMenuForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FastMapViewer.resx">
+      <DependentUpon>FastMapViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MapViewer.resx">
+      <DependentUpon>MapViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProgressForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainMenuForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>MainMenuForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SimpleMainMenuForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SimpleMainMenuForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TileSizeChooser.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>TileSizeChooser.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="DwarfFortressMapViewer_TemporaryKey.pfx" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ZLayerList.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dfmvicon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dfmvicon.ico" />
+    <BaseApplicationManifest Include="Properties\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="dfmap-readme.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ICSharpCode.SharpZipLib.dll" />
+    <Content Include="main.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="AxShockwaveFlashObjects">
+      <Guid>{D27CDB6B-AE6D-11CF-96B8-444553540000}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>aximp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

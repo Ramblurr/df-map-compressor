@@ -1,0 +1,6 @@
+body { color: #ffffff; background-color:#000000; font-family:x-small "Trebuchet MS",Trebuchet,Verdana,Arial; font-size:100%};
+body.leftbar { font-family:Verdana,Arial; font-size:80%; }
+a:link { color:#ccccff; text-decoration:none; }
+a:visited { color:#ffccff; text-decoration:none; }
+a:hover { color:#a0d090; text-decoration:underline; }
+a:active { color:#ffffaa; text-decoration:underline; }

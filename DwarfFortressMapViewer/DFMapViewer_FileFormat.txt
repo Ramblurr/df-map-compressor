@@ -1,0 +1,33 @@
+File format of the df-fort-map file:
+
+This is all compressed with LZMA, so to read the file you would have to decompress it with LZMA. (I made a LZMAStream class which calls LZMA functions and such, and basically presents an interface much like the ZipStream class in .NET's API, since it's easier to use than what LZMA's library has)
+
+Int32 numberOfTiles (Number of unique tile images - not the total number of tiles in the map)
+Int32 tileWidth (width of each tile in pixels)
+Int32 tileHeight (height of each tile in pixels)
+
+Int32 mapWidthInTiles (number of columns of tiles in the map)
+Int32 mapHeightInTiles (number of rows of tiles in the map)
+
+For each unique tile image:
+	A sequence of values repeated:
+		UInt8 numberOfPixels
+		UInt8 blue
+		UInt8 green
+		UInt8 red
+		(I think. It might be red, green, blue, but if I remember right what gets written out in the end is really BGR instead of RGB, due to how it's stored in memory or somesuch)
+	While reading this, start with 0 filled pixels for the tile image (which should be tileWidth x tileHeight pixels in size), and read one set of those values. Fill in numberOfPixels horizontally with the specified color, wrapping around to the next row of pixels if you hit the end of the current row of pixels.
+	You're finished with that tile image when the total number of pixels you've added equals the number of pixels that should be in the tile image (tileWidth * tileHeight).
+	If there are more tile images to read, go onto the next one. If not, you're ready to read the list of indices corresponding to each tile of the map.
+	
+For each tile on the map (mapWidthInTiles * mapHeightInTiles), starting from the upper-left corner and going to down, wrapping to the next column at the end of the column:
+	VarSize tileImageIndex (the first one read was 0)
+	
+	VarSize depends on the value of numberOfTiles:
+		If it is 255 or less, then VarSize is a UInt8.
+		If not, if it is 65535 or less, then VarSize is a UInt16.
+		If not, then VarSize is a UInt32.
+		
+		In practice, for me, it has always been a UInt16, but an early map may end up being a UInt8, and a world map might (or might not) too.
+
+That's everything!

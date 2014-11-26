@@ -1,0 +1,130 @@
+File format of the df-map and fdf-map file:
+
+DF-MAP uses LZMA, FDF-MAP uses deflate (zlib). (I made a LZMAStream class which calls LZMA functions and such, and basically presents an interface much like the ZipStream class in .NET's API, since it's easier to use than what LZMA's library has)
+
+Note: Clipping is never used. RLE is not yet in a publicly released version of the compressor. There may be a bug in the RLE-writer which needs to be found before it can be released.
+
+Int32 negativeVersion (this would be a negative number for the new multi-layer-supporting format, or >=0 for the previous format, which doesn't support multi-layer images. For the doc on the previous format, see DFMapViewer_FileFormat.txt (this is DFMapViewer_FileFormat_2.txt. Note that this variable is numberOfTiles in the old format, and is guaranteed to be >=0 in it.))
+	negativeVersion can be changed into Int32 featureBitflags = (-1 - negativeVersion), which you can then check for the following bitflags to determine whether the file contains particular information:
+	Features:
+		0x01:	[TileID] information (Information on Font/color)
+		0x02:	[RLE] information in map indices
+		0x04:	[Clipping] bounds in map layer information
+		
+	For example, these combinations would give the following negativeVersion variables
+					None	TileID		RLE
+		None: 		-1
+		TileID: 	-2
+		RLE:		-3		-4
+		Clipping:	-5		-6			-7
+		
+		And if you had a file with all three, it would have a negativeVersion value of -8.
+		
+	Sections of this document which are particular to files with particular features are inside <TileID> </TileID> tags or the like.
+	
+Int32 numberOfTiles (Number of unique tile images - not the total number of tiles in the map)
+Int32 tileWidth (width of each tile in pixels)
+Int32 tileHeight (height of each tile in pixels)
+
+
+Int32 numMapLayers (how many map layers are in the image - for an old DF image, this would be one)
+
+For each map layer:
+	Int32 mapLayerDepth (This may change, but I'm thinking 0 would be the ground layer, and higher (towards the sky) layers (if any) would have positive numbers, and lower (deeper) layers would have negative numbers - higher numbers are higher altitude, lower numbers are lower altitude.)
+	Int32 mapLayerWidthInTiles (number of columns of tiles in this map layer, including columns which were clipped)
+	Int32 mapLayerHeightInTiles (number of rows of tiles in this map layer, including rows which were clipped)
+	<Clipping>
+	Int32 mapLayerWestClipped (number of columns of tiles which were clipped from the west of the map layer)
+	Int32 mapLayerEastClipped (number of columns of tiles which were clipped from the east of this map layer)
+	Int32 mapLayerNorthClipped (number of rows of tiles which were clipped from the north of this map layer)
+	Int32 mapLayerSouthClipped (number of rows of tiles which were clipped from the south of this map layer)
+	<Clipping>
+	
+	
+For each unique tile image:
+	<TileID>
+		UInt8 characterCode - 0 is the one in the upper-left of the font bmp. 1 is one to the right. 2 is the next one to the right. The first character in the second row is 16 (the first row was 0), etc.
+		UInt8 backgroundColor
+		UInt8 foregroundColor
+		
+		If the tile did not match any fontCharacter/bgcolor/fgcolor combination, it will be written as 0xff,0xff,0xff.
+		0xff by itself may be a valid character code, so you should only consider it nonmatching if the bgcolor and fgcolor are also 0xff.
+	</TileID>
+	
+	A sequence of values repeated:
+		UInt8 numberOfPixels
+		UInt8 blue
+		UInt8 green
+		UInt8 red
+		(I think. It might be red, green, blue, but if I remember right what gets written out in the end is really BGR instead of RGB, due to how it's stored in memory or somesuch)
+	While reading this, start with 0 filled pixels for the tile image (which should be tileWidth x tileHeight pixels in size), and read one set of those values. Fill in numberOfPixels horizontally with the specified color, wrapping around to the next row of pixels if you hit the end of the current row of pixels.
+	You're finished with that tile image when the total number of pixels you've added equals the number of pixels that should be in the tile image (tileWidth * tileHeight).
+	If there are more tile images to read, go onto the next one. If not, you're ready to read the list of indices corresponding to each tile of the map.
+
+For each map layer (again):
+	<Clipping>
+		ActualMapLayerWidthInTiles is (mapLayerWidthInTiles-mapLayerWestClipped)-mapLayerEastClipped
+		ActualMapLayerHeightInTiles is (mapLayerHeightInTiles-mapLayerNorthClipped)-mapLayerSouthClipped
+		For each tile on the map layer (actualMapLayerWidthInTiles * actualMapLayerHeightInTiles), starting from the upper-left corner and going down to the bottom, wrapping to the top of the next column at the bottom of each column (same as before):
+	</Clipping>
+	<NOT Clipping>
+		For each tile on the map layer (mapLayerWidthInTiles * mapLayerHeightInTiles), starting from the upper-left corner and going down to the bottom, wrapping to the top of the next column at the bottom of each column (same as before):
+	</NOT Clipping>
+	
+	<NOT RLE>
+		VarSize tileImageIndex (the first image read was index 0)
+		
+		VarSize depends on the value of numberOfTiles:
+			If it is 255 or less, then VarSize is a UInt8.
+			If not, if it is 65535 or less, then VarSize is a UInt16.
+			If not, then VarSize is a UInt32.
+			
+			In practice, for me, it has always been a UInt16, but an early map may end up being a UInt8, and a world map might (or might not) too.
+	</NOT RLE>
+	
+	<RLE>
+	There will be that many tiles total, but with RLE encoding, they will be represented with less data.
+	Repeated many times:
+		VarSize tileIndexAndFlag
+		May or may not exist, depending on whether tileIndexAndFlag has a flag in it: UInt8 numberOfTiles
+		
+		Each time you read the tileIndexAndFlag variable, check it like so:
+			tileIndexAndFlag is (except for Flag) a tile image index (just like normal, index 0 is the first image). The Flag should not be considered part of the tile image index. If tileIndexAndFlag contained Flag, then it is followed by a UInt8 numberOfTiles, which specifies the number of tiles which this entry represents. If this did not contain Flag, then it is only one tile.
+			
+			How do you know which tiles this represents? They go in the same order they did without RLE, the RLE just lets up to 255 be represented by each entry here.
+			
+			(If there is a situation where there are more than 255 of the same tile following each other, there will be more than one of these for them, since only 255 can be represented by each entry.)
+			
+		VarSize and Flag depend on the value of numberOfTiles:
+			If it is 127 or less, then VarSize is a UInt8 and Flag is 0x80.
+			If not, if it is 32767 or less, then VarSize is a UInt16 and Flag is 0x8000.
+			If not, then VarSize is a UInt32 and Flag is 0x80000000.
+	
+	Note: An RLE entry will never span across multiple map layers. When x and y reach their maximum, number of tiles reaches its maximum, for that map layer, the amount of tiles left to do for the current RLE entry should always reach 0 at the same time. Thus, you do not need to inherit tile index or amount across multiple map layers (In tests, allowing RLE entries to span across multiple map layers saved a grand total of 28 bytes in the exported fdf-map file for my 19-layer 288x288 tile 16x16 font-size test map, so I disallowed it to make it easier to implement support for this feature in the map viewer).
+	
+	RLE entries *can* include tiles in more than one column in the same layer. If you reach the bottom of one column and have tiles left to set for the entry, go to the beginning of the next column and contine to set tiles as normal.
+	
+	numberOfTiles will never be 0 or 1.
+	tileIndexAndFlag (once you remove the flag) should always be < the number of unique tile images.
+	</RLE>
+	
+That's everything!
+
+
+Color codes:
+Black: 0
+Blue: 1
+Green: 2
+Cyan: 3
+Red: 4
+magenta: 5
+brown: 6
+lgray: 7
+dgray: 8
+lblue: 9
+lgreen: 10
+lcyan: 11
+lred: 12
+lmagenta: 13
+yellow: 14
+white: 15

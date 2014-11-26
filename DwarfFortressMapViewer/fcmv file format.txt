@@ -1,0 +1,23 @@
+FCMV file format - The entire file is compressed with deflate, just like fdf-map files.
+
+	UInt32 version (should be 900)
+	UInt32 cols (should be 80, same as in the cmv)
+	UInt32 rows (should be 25, same as in the cmv)
+	UInt32 unknown (same as in the cmv)
+	# Note that because the CMV file format page stated that only the intro movie contained sound (and this does seem to be the case, though the soundless CMV movies still contain a seemingly useless 12804-bytes-long sound data section), I have had the encoder read but ignore the sound section - it does not write it to the FCMV file.
+	# This is followed by frame data, which continues until the end of the file:
+	
+	For each frame:
+		byte frameDataType
+		if frameDataType is 0:
+			# This means that the entire contents of the frame are here.
+			byte[frameSize] frameData	# frameSize is 2*cols*rows. This is in the same format as the compressed frame data in the CMV format, except this is not compressed (except insofar as the entire file is compressed).
+		else if frameDataType is 1:
+			# This means that we have only differences stored.
+			Int32 numberOfDifferences
+			For each difference:
+				UInt16 bytePositionOfDifference # This is essentially an index for byte[] frameData. This specifies that for this frame, compared to the previous frame, the byte at this position should be changed to whatever 'data' holds.
+				byte data
+			# All data bytes that don't have specified differences are the same as in the previous frame.
+		
+		# The encoder will, for each frame, use whichever frame data type will result in a smaller output size for that frame.

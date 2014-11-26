@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head><link rel="stylesheet" type="text/css" href="main.css" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Dwarf Fortress Map Compressor</title></head><body>
+<table cellspacing=2 cellpadding=10><tr><td size="80%" valign="top">
+
+<p>Last updated May 7, 2007, for version 2.0.0, and June 5, 2007, for the java version.</p>
+
+<ul><li>C# (<a href="http://www.microsoft.com/downloads/details.aspx?familyid=AEA55F2F-07B5-4A8C-8A44-B4E1B196D5C0&displaylang=en">.NET 2.0</a> required) version: <a href="DFMapCompressor-2.0.0.7z">[Download (.7z) (103 KB)]</a> | <a href="DFMapCompressor-2.0.0.zip">[Download (.zip) (125 KB)]</a> | <a href="dfmap-readme.html">Readme file (also included in the download)</a> - most feature-complete version
+</li><li>Java (Java 5.0 (aka 1.5) required) version: <a href="dfmc.jnlp">[Run/Download (Java WebStart - .jnlp) (Total 16.2 KB)]</a> - can only make fdf-map files, no integrated viewer, lacks most other features in C# version
+</li></ul>
+
+<p>If you don't have .NET 2.0, you should be able to get it from Windows Update. Alternately, you can download the <a href="http://www.microsoft.com/downloads/details.aspx?familyid=AEA55F2F-07B5-4A8C-8A44-B4E1B196D5C0&displaylang=en">.NET 2.0 framework redistributable package</a>, and install that.
+
+<p>The java version is mainly intended for platforms where the C# version is unusable - for example, windows 98 or other windowses that can't get .NET 2.0, or in linux*, or on a Mac. If you can run java 5.0 (aka 1.5), you should be able to run the java version.</p>
+
+<p>* = As long as you can run java programs that use Swing.</p>
+
+<h2>About the C# version</h2>
+
+<p>This program was written in C#, and requires at least the .NET Framework 2.0 to run. It does not appear to work in Mono.NET as of May 2007 - Mono just silently died without any exception messages when I tried it (after disabling the one or two .NET function calls that were unsupported).</p>
+
+<p>The DF Map Compressor is a program I made to encode Dwarf Fortress fortress or world map images into a much smaller format than is possible with normal image formats. Here's a quick summary of how it works: It determines the size of your tiles from your DF font file (or asks you), splits the map up into tiles, identifies duplicate tiles, writes out every unique tile image, and then writes out a list of ID#s for each tile position which points to the tile image for that tile. What it outputs is piped through the LZMA compressor (the one used in 7-zip), to compress it further. The .df-map file which it writes out is usually less than 100 KB in size. (By comparison, a PNG of the same map can exceed 2 megabytes, depending on how well you compress it, whether you change the color depth, and whether you are using a graphical tileset or detailed font)</p>
+
+<p>This program used to be called the "DF Map Viewer," but the compressing aspect of it is the primary focus, so it has been renamed.
+
+<p>Version 2.0 of this program can output a .fdf-map file for use with <a href="http://mkv25.net/dfma/" target="_blank">Markavian's flash DF map viewer. He also has an upload service (called the <a href="http://mkv25.net/dfma/" target="_blank">DF Map Archive</a>) where you can upload your fdf-map and then share the link to it with friends. His map viewer (which runs quite a lot faster than the one in my program) lets you scroll around and zoom in and out. You do need my program to create the fdf-map file - his flash app is just a viewer. (fdf-map files are usually around 15 KB larger than df-map files, which isn't much except for df-map files being so small already)</p>
+
+<p>If you don't want to use Markavian's flash DF map viewer and map archive, you can instead share the .df-map file with friends, and they can use this program to create a PNG from it (or open a resizable map viewer (which is unfortunately kind of slow), which lets you scroll around and zoom in and out on the map).</p>
+
+
+<h2>About the Java version</h2>
+<p>I've ported the compressor to java, and you can <a href="dfmc.jnlp">follow this link to get it</a> (<b>Requires Java 5.0 (aka 1.5) or better</b>). That's a Java WebStart thingy (if it downloads instead of running, just double-click it, or if you can't double click jnlp's to run them, do 'javaws dfmc.jnlp' from the directory it is in). The java version can ONLY make .fdf-map files. It accepts png and bmp files for compressing, but you can also force it to read another image format (like .gif), if you really want to (just type *.gif in the file open dialog). That's normally not allowed because most gifs wind up being dithered or otherwise have their image data corrupted such that the program is unable to find as many tile image matches, and thus unable to compress the image as well as it otherwise could.
+</p><p>The java version also lacks most of the features in the C# version - all it can do is turn images into fdf-map files. For example, the C# version can figure it out the tile size of an image in your DF folder, and can often also figure out where your DF folder to make the select-file-to-compress dialog start in your DF folder. The java version can't do either of those things. It also uses more RAM (despite my keeping the buffer sizes the same) than the C# version. It seems to run slower too (unless I ran the java one in the event dispatch thread, in which case it ran at the same speed or slightly faster than the C# one, but then you wouldn't have a working progress bar).
+</p><p>
+The java version does have a button to go to Markavian's Map Archive, and... hopefully it will actually work everywhere. I'm using <a href="http://java.sun.com/j2se/1.5.0/docs/guide/javaws/jnlp/javax/jnlp/BasicService.html#showDocument(java.net.URL)">JNLP's openDocument method</a> for it. If it doesn't work, or takes over an existing tab/window, you can blame Sun.
+</p><p>P.S. Java Webstart required me to sign the jar files to make them runnable*. I used a self-signed certificate which says that it will expire in about 6 months. Presumably I have to somehow make a new one or something by then, and re-upload the jar file (Java Webstart should automatically redownload it then). (I didn't want to pay fees for a certificate, and I didn't want to have to put my real address and crap in a certificate that anyone can read either, as that to me does not sound wise)</p>
+<p>* = It IS possible to run it unsigned, but you have to use particular APIs to load and save files. I implemented this, and tested it, and it has several problems which have led me to stick with a signed JAR file and using normal file selection dialogs. Specifically: The JNLP FileOpenService can (and does here) ignore the specified file types, showing all file types in the open file dialog. It also doesn't show the specified title for the dialog. The JNLP FileSaveService's dialog sometimes inexplicably fails to open after the user grants permission to it. It freezes the thread, and basically the program stops working properly afterward. Sometimes it does open, but here too it ignores the specified file extension(s), and apparently ignores any specified default filename. Finally, when I clicked OK on the FileSaveService's file save dialog, it returned null, which it was only supposed to do if the user *cancelled* the dialog. It also didn't save the file. After trying saving several dozen times, and finding it unreliable in the extreme, I said "fuck it" and went back to using the real java API for file loading and saving. This unreliability may be me using the JNLP file I/O API wrong, but if so, that would be due to Sun failing to document it properly (the <a href="http://java.sun.com/javase/6/docs/jre/api/javaws/jnlp/javax/jnlp/FileSaveService.html">documentation</a> looks correct, but lacks important details (such as whether you can pass null or "" for the pathHint or name), and the saveFileDialog method (function) clearly isn't working as described). Or, it may or may not be because I'm using the 1.5 JDK (1.5 aka 5.0, because Sun is loony) - maybe it was broken in 1.5 and got fixed in 1.6. If so, I'm not going to compile this with 1.6 (Java 6) just to hope that it makes the JNLP file I/O API work properly. I'm using 1.5 because Apple hasn't released a 1.6 JDE for Macs yet, and because java 6 is fairly recent, so a lot of people probably don't have it yet.</p>
+<p>On the plus side, I was able to successfully use the JNLP API to make the Map-Archive-Visiting button work.</p>
+
+<p>The funny thing about that experiment was that, with the unsigned applet, which was supposed to not have the hassle of security stuff, instead of asking the user once for permission to do stuff... It asked twice.</p>
+<h2>Reporting bugs</h2>
+<p>If you find any bugs in this program, you can tell me on IRC at #bay12games on us.worldirc.org (or eu.worldirc.org, etc), and I'll usually be named 'SL' there. You can send me a message with /msg. Also, you can often find Markavian there, and sometimes ToadyOne (the creator of Dwarf Fortress). (I'm not always actually at the computer when I'm signed onto IRC, but if you send me a /msg, I'll see it when I get back)</p>
+</td><td>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9085043312647698";
+google_ad_width = 120;
+google_ad_height = 240;
+google_ad_format = "120x240_as_rimg";
+google_cpa_choice = "CAAQhfCXhAIaCK7w-fkB92ocKPG193MwAA";
+google_ad_channel = "9659380175";
+//-->
+</script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9085043312647698";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_channel ="";
+google_page_url = document.location;
+google_color_border = "000019";google_color_bg = "001900";
+google_color_link = "FFFFEE";google_color_url = "CCCCFF";google_color_text = "EEFFFF";//--></script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js" align="bottom"></script></td></tr></table>
+</html>

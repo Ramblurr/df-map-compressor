@@ -1,0 +1,81 @@
+File format of the df-fort-map file:
+
+This is all (for DF-MAP) compressed with LZMA, so to read the file you would have to decompress it with LZMA. (I made a LZMAStream class which calls LZMA functions and such, and basically presents an interface much like the ZipStream class in .NET's API, since it's easier to use than what LZMA's library has)
+(The FDF-MAP format uses zlib instead of LZMA)
+
+Int32 negativeVersion (this would be -1 for the new multi-layer-supporting format, or >=0 for the previous format, which doesn't support multi-layer images. For the doc on the previous format, see DFMapViewer_FileFormat.txt (this is DFMapViewer_FileFormat_2.txt. Note that this variable is numberOfTiles in the old format, and is guaranteed to be >=0 in it.))
+	(negativeVersion will be -2 if font/color information is included for the unique tile images)
+	(negativeVersion will be -3 if RLE information is included in the map indices but font/color information is not included for the unique tile images)
+	(negativeVersion will be -4 if RLE information is included in the map indices and font/color information is included for the unique tile images.)
+Int32 numberOfTiles (Number of unique tile images - not the total number of tiles in the map)
+Int32 tileWidth (width of each tile in pixels)
+Int32 tileHeight (height of each tile in pixels)
+
+Int32 numMapLayers (how many map layers are in the image - for an old DF image, this would be one)
+
+For each map layer:
+	Int32 mapLayerDepth (This may change, but I'm thinking 0 would be the ground layer, and higher (towards the sky) layers (if any) would have positive numbers, and lower (deeper) layers would have negative numbers - higher numbers are higher altitude, lower numbers are lower altitude.)
+	Int32 mapLayerWidthInTiles (number of columns of tiles in this map layer)
+	Int32 mapLayerHeightInTiles (number of rows of tiles in this map layer)
+
+For each unique tile image:
+	(If negativeVersion is -2 or -4:
+		UInt8 characterCode - 0 is the one in the upper-left of the font bmp. 1 is one to the right. 2 is the next one to the right. The first character in the second row is 16 (the first row was 0), etc.
+		UInt8 backgroundColor
+		UInt8 foregroundColor
+		
+		If the tile did not match any fontCharacter/bgcolor/fgcolor combination, it will be written as 0xff,0xff,0xff.
+		0xff by itself may be a valid character code, so you should only consider it nonmatching if the bgcolor and fgcolor are also 0xff.
+	)
+	A sequence of values repeated:
+		UInt8 numberOfPixels
+		UInt8 blue
+		UInt8 green
+		UInt8 red
+		(I think. It might be red, green, blue, but if I remember right what gets written out in the end is really BGR instead of RGB, due to how it's stored in memory or somesuch)
+	While reading this, start with 0 filled pixels for the tile image (which should be tileWidth x tileHeight pixels in size), and read one set of those values. Fill in numberOfPixels horizontally with the specified color, wrapping around to the next row of pixels if you hit the end of the current row of pixels.
+	You're finished with that tile image when the total number of pixels you've added equals the number of pixels that should be in the tile image (tileWidth * tileHeight).
+	If there are more tile images to read, go onto the next one. If not, you're ready to read the list of indices corresponding to each tile of the map.
+
+For each map layer (again):
+	For each tile on the map layer (mapLayerWidthInTiles * mapLayerHeightInTiles), starting from the upper-left corner and going to down, wrapping to the next column at the end of the column (same as before):
+		VarSize tileImageIndex (the first one read was 0)
+		
+		VarSize depends on the value of numberOfTiles:
+			If it is 255 or less, then VarSize is a UInt8.
+			If not, if it is 65535 or less, then VarSize is a UInt16.
+			If not, then VarSize is a UInt32.
+			
+			In practice, for me, it has always been a UInt16, but an early map may end up being a UInt8, and a world map might (or might not) too.
+
+That's everything!
+
+
+Color codes:
+Black: 0
+Blue: 1
+Green: 2
+Cyan: 3
+Red: 4
+magenta: 5
+brown: 6
+lgray: 7
+dgray: 8
+lblue: 9
+lgreen: 10
+lcyan: 11
+lred: 12
+lmagenta: 13
+yellow: 14
+white: 15
+
+TODO:
+	Test the compressing benefit of all of the following changes for index variables, and choose the best one:
+		1. -20 10   Write out 20 tiles from index 10 (both are normal index size)
+		2. (10|0x8000) 20
+			2a. the length (20) is a byte
+			2b. the length (20) is a word
+			2c. the length (20) is a dword
+		
+		Both will require changing the amount of unique tiles which triggers an increase in index variable size
+		
