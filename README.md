@@ -1,18 +1,14 @@
-# DF Map Compressor / Viewer
+# Dwarf Fortress Map Compressor
 
-This program was made by SL (shadowlord13@gmail.com) and powers the maps
-viewable at the [DF Map Archive](http://mkv25.net/dfma/)
+Current Version: 3.3.4 (released in 2009)
 
-
-[Source](https://raw.githubusercontent.com/Ramblurr/df-map-compressor/master/DwarfFortressMapViewer/dfmap-readme.html "Permalink to Dwarf Fortress Map Compressor (3.3.4)")
-
-# Dwarf Fortress Map Compressor (3.3.4)
 
 This program was made by SL (shadowlord13@gmail.com), and you can find it on
-the Dwarf Fortress File Depot or at <http: shadowlord13.googlepages.com=""
-dfmap-index.html="">. It was made in C#, and requires that you have at least
-the .NET framework 2.0 or Mono 1.2.6 (or newer - run with mono --debug
+the Dwarf Fortress File Depot. It was made in C#, and requires that you have at
+least the .NET framework 2.0 or Mono 1.2.6 (or newer - run with mono --debug
 DwarfFortressMapCompressor.exe) installed to use it.
+
+It powers the maps viewable at the [DF Map Archive](http://mkv25.net/dfma/).
 
 The basic purpose of this program is to losslessly compress an image which is
 made up of many fixed-size images which are used many times, into a format
